@@ -20,3 +20,12 @@ def load_data(path):
     labels = [label_map[label] for label in string_labels]
     
     return texts, labels, label_map
+
+def tokenize_data(texts, tokenizer):
+    return tokenizer(
+        texts,
+        padding=True,          # pad short texts to same length
+        truncation=True,       # cut long texts to max length
+        max_length=512,        # BERT's limit
+        return_tensors='pt'    # return PyTorch tensors
+    )
