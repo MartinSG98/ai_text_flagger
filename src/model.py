@@ -1,4 +1,4 @@
-from transformers import BertTokenizer, BertForSequenceClassification, Trainer, TrainingArguments
+from transformers import BertTokenizer, BertForSequenceClassification, Trainer, TrainingArguments, EarlyStoppingCallback
 from datasets import Dataset
 import json
 
@@ -47,7 +47,7 @@ def load_model(num_labels):
 def get_training_args(output_dir):
     return TrainingArguments(
         output_dir=output_dir,                  # where to save model checkpoints
-        num_train_epochs=3,                     # how many times to loop through training data
+        num_train_epochs=10,                    # how many times to loop through training data
         per_device_train_batch_size=16,         # samples processed at once during training
         per_device_eval_batch_size=16,          # samples processed at once during evaluation
         learning_rate=2e-5,                     # step size for weight updates (0.00002)
@@ -81,7 +81,8 @@ def train():
         model=model,
         args=training_args,
         train_dataset=train_dataset,
-        eval_dataset=val_dataset
+        eval_dataset=val_dataset,
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=2)]
     )
     
     # Train!
