@@ -45,3 +45,10 @@ def create_dataset(texts, labels, tokenizer):
     })
     
     return dataset
+
+def load_model(num_labels):
+    model = BertForSequenceClassification.from_pretrained(
+        'bert-large-cased',
+        num_labels=num_labels
+    )
+    return model
