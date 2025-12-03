@@ -52,3 +52,17 @@ def load_model(num_labels):
         num_labels=num_labels
     )
     return model
+
+def get_training_args(output_dir):
+    return TrainingArguments(
+        output_dir=output_dir,                  # where to save model checkpoints
+        num_train_epochs=3,                     # how many times to loop through training data
+        per_device_train_batch_size=16,         # samples processed at once during training
+        per_device_eval_batch_size=16,          # samples processed at once during evaluation
+        learning_rate=2e-5,                     # step size for weight updates (0.00002)
+        weight_decay=0.01,                      # regularization to prevent overfitting
+        eval_strategy="epoch",                  # evaluate after each epoch
+        save_strategy="epoch",                  # save checkpoint after each epoch
+        load_best_model_at_end=True,            # keep best model, not just final one
+        logging_dir=f"{output_dir}/logs"        # where to save training logs
+    )
