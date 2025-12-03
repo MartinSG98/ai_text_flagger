@@ -29,3 +29,19 @@ def tokenize_data(texts, tokenizer):
         max_length=512,        # BERT's limit
         return_tensors='pt'    # return PyTorch tensors
     )
+
+def create_dataset(texts, labels, tokenizer):
+    tokenized = tokenizer(
+        texts,
+        padding=True,
+        truncation=True,
+        max_length=512
+    )
+    
+    dataset = Dataset.from_dict({
+        'input_ids': tokenized['input_ids'],
+        'attention_mask': tokenized['attention_mask'],
+        'labels': labels
+    })
+    
+    return dataset
