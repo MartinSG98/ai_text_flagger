@@ -2,7 +2,9 @@ import os
 import csv
 import json
 from docx import Document
+import sys
 
+csv.field_size_limit(100_000_000)  # 100 million characters
 
 def collect_files(dataset_path):
     files = []
@@ -19,14 +21,6 @@ def collect_files(dataset_path):
     return files
 
 
-#debugging purpose - to be deleted
-if __name__ == "__main__":
-    dataset_path = "Datasets"  # adjust if needed
-    files = collect_files(dataset_path)
-    print(f"Found {len(files)} files")
-    for f in files[:5]:  # print first 5 as sample
-        print(f)
-
 def extract_text(file_path):
     if file_path.endswith('.txt'):
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -37,9 +31,9 @@ def extract_text(file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             text_column = None
-            for name in ['text', 'generated', 'content', 'article']:
-                if name in reader.fieldnames:
-                    text_column = name
+            for field in reader.fieldnames:
+                if field.lower() in ['text', 'generated', 'content', 'article']:
+                    text_column = field
                     break
             if text_column is None:
                 print(f"No suitable text column found in {file_path}")
@@ -49,18 +43,18 @@ def extract_text(file_path):
         return texts
     
     elif file_path.endswith('.json'):
-       with open(file_path, 'r', encoding='utf-8') as f:
-           data = json.load(f)
-           if isinstance(data, list):
-               texts = []
-               for item in data:
-                   for key in ['text', 'generated', 'content', 'article']:
-                       if key in item:
-                           texts.append(item[key])
-                           break
-               return texts
-           else:
-               return []
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            if isinstance(data, list):
+                texts = []
+                for item in data:
+                    for key in item.keys():
+                        if key.lower() in ['text', 'generated', 'content', 'article']:
+                            texts.append(item[key])
+                            break
+                return texts
+            else:
+                return []
             
     elif file_path.endswith('.docx'):
         doc = Document(file_path)
@@ -69,3 +63,23 @@ def extract_text(file_path):
     
     else:
         return []  # unsupported file type
+    
+
+def build_dataset(dataset_path, output_path):
+    dataset = []
+    files = collect_files(dataset_path)
+    for file_path, label in files:
+        print(f"Processing: {file_path}")  # add this line
+        texts = extract_text(file_path)
+        for text in texts:
+            dataset.append({"text": text,"label": label, "source_file": file_path})
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(dataset, f)
+    return dataset
+    
+
+
+    #debugging purpose - to be deleted
+if __name__ == "__main__":
+    build_dataset("Datasets", "output/dataset.json")
+    print("Done!")
