@@ -78,7 +78,6 @@ def build_dataset(dataset_path, output_path):
     return dataset
     
 
-
     #debugging purpose - to be deleted
 if __name__ == "__main__":
     build_dataset("Datasets", "output/dataset.json")
