@@ -129,3 +129,18 @@ ai_text_flagger/
 ├── requirements.txt
 └── README.md
 ```
+
+## Hardware Notes
+
+Developed and trained on:
+
+- CPU: AMD Ryzen 9 9900X
+- GPU: NVIDIA RTX 5090 (32GB VRAM)
+
+**RTX 50-series users:** The 5090 requires PyTorch nightly build (stable doesn't support sm_120 yet):
+
+```bash
+pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu128
+```
+
+**Inference:** The trained model can run on any CUDA-compatible GPU or CPU (slower).
