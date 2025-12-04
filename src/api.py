@@ -13,6 +13,7 @@ class PredictRequest(BaseModel):
 class PredictResponse(BaseModel):
     prediction: str
     confidence: float
+    ai_probability: float
 
 app = FastAPI()    
 
