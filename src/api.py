@@ -5,8 +5,6 @@ from io import BytesIO
 from docx import Document
 from pypdf import PdfReader
 
-
-
 class PredictRequest(BaseModel):
     text: str
 
