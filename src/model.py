@@ -22,17 +22,29 @@ def load_data(path, label_map=None):
     
     return texts, labels, label_map
 
-def create_dataset(texts, labels, tokenizer):
-    tokenized = tokenizer(
-        texts,
-        padding=True,
-        truncation=True,
-        max_length=512
-    )
+def create_dataset(texts, labels, tokenizer, batch_size=1000):
+    all_input_ids = []
+    all_attention_masks = []
+    
+    for i in range(0, len(texts), batch_size):
+        batch_texts = texts[i:i+batch_size]
+        print(f"Tokenizing {i}/{len(texts)}...")
+        
+        tokenized = tokenizer(
+            batch_texts,
+            padding='max_length',
+            truncation=True,
+            max_length=512
+        )
+        
+        all_input_ids.extend(tokenized['input_ids'])
+        all_attention_masks.extend(tokenized['attention_mask'])
+    
+    print(f"Tokenizing {len(texts)}/{len(texts)}... Done!")
     
     dataset = Dataset.from_dict({
-        'input_ids': tokenized['input_ids'],
-        'attention_mask': tokenized['attention_mask'],
+        'input_ids': all_input_ids,
+        'attention_mask': all_attention_masks,
         'labels': labels
     })
     
@@ -59,20 +71,25 @@ def get_training_args(output_dir):
     )
 
 def train():
-    # Load tokenizer
+    print("Loading tokenizer...")
     tokenizer = load_tokenizer()
     
-    # Load data
+    print("Loading training data...")
     train_texts, train_labels, label_map = load_data('output/train.json')
-    val_texts, val_labels, _ = load_data('output/val.json', label_map)
+    print(f"Loaded {len(train_texts)} training samples")
     
-    # Create datasets
+    print("Loading validation data...")
+    val_texts, val_labels, _ = load_data('output/val.json', label_map)
+    print(f"Loaded {len(val_texts)} validation samples")
+    
+    print("Tokenizing training data...")
     train_dataset = create_dataset(train_texts, train_labels, tokenizer)
+    print("Tokenizing validation data...")
     val_dataset = create_dataset(val_texts, val_labels, tokenizer)
     
-    # Load model
+    print("Loading model...")
     model = load_model(num_labels=len(label_map))
-    
+        
     # Training args
     training_args = get_training_args('output/model')
     
