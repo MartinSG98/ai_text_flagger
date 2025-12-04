@@ -1,6 +1,7 @@
 from transformers import BertTokenizer, BertForSequenceClassification, Trainer, TrainingArguments, EarlyStoppingCallback
 from datasets import Dataset
 import json
+import torch
 
 def load_tokenizer():
     return BertTokenizer.from_pretrained('bert-large-cased')
@@ -108,7 +109,47 @@ def train():
     # Save
     trainer.save_model('output/model/final')
     
+    # Save label map
+    with open('output/model/final/label_map.json', 'w') as f:
+        json.dump(label_map, f)
+
     return label_map
+
+
+def predict(text, model_path='output/model/final'):
+    print("Loading tokenizer and model...")
+    tokenizer = load_tokenizer()
+    model = BertForSequenceClassification.from_pretrained(model_path)
+    
+    # Load label map
+    with open(f"{model_path}/label_map.json", 'r') as f:
+        label_map = json.load(f)
+    # Reverse it: {0: "Human", 1: "GPT-4", ...}
+    id_to_label = {v: k for k, v in label_map.items()}
+    
+    print("Tokenizing input text...")
+    tokenized = tokenizer(
+        text,
+        padding='max_length',
+        truncation=True,
+        max_length=512,
+        return_tensors='pt'
+    )
+    
+    print("Making prediction...")
+    model.eval()  # set to evaluation mode
+    with torch.no_grad():  # disable gradient calculation
+        outputs = model(**tokenized)
+    
+    probabilities = torch.softmax(outputs.logits, dim=1)
+    confidence, predicted_class_id = torch.max(probabilities, dim=1)
+    
+    label = id_to_label[predicted_class_id.item()]
+    
+    return {
+        "prediction": label,
+        "confidence": confidence.item(),
+    }   
 
 if __name__ == "__main__":
     label_map = train()
