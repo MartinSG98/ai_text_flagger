@@ -1,9 +1,10 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from pydantic import BaseModel
-from model import predict
+from src.model import predict
 from io import BytesIO
 from docx import Document
 from pypdf import PdfReader
+from fastapi.middleware.cors import CORSMiddleware
 
 class PredictRequest(BaseModel):
     text: str
@@ -14,6 +15,14 @@ class PredictResponse(BaseModel):
     ai_probability: float
 
 app = FastAPI()    
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # React dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/health")
 def health_check():
