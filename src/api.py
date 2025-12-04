@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from model import predict
 from io import BytesIO
 from docx import Document
+from pypdf import PdfReader
 
 
 
@@ -35,8 +36,8 @@ def make_prediction(request: PredictRequest):
 @app.post("/predict/file", response_model=PredictResponse)
 async def predict_from_file(file: UploadFile = File(...)):
     filename = file.filename.lower()
-    if not filename.endswith(('.txt', '.docx')):
-        raise HTTPException(status_code=400, detail="Please upload a .txt or .docx file")
+    if not filename.endswith(('.txt', '.docx', '.pdf')):
+        raise HTTPException(status_code=400, detail="Please upload a .txt, .docx, or .pdf file")
     
     try:
         content = await file.read()
@@ -46,9 +47,12 @@ async def predict_from_file(file: UploadFile = File(...)):
         elif filename.endswith('.docx'):
             doc = Document(BytesIO(content))
             text = '\n'.join([para.text for para in doc.paragraphs])
-        
+        elif filename.endswith('.pdf'):
+            reader = PdfReader(BytesIO(content))
+            text = '\n'.join([page.extract_text() or '' for page in reader.pages])
+
         if not text.strip():
-            raise HTTPException(status_code=400, detail="The uploaded file is empty")
+            raise HTTPException(status_code=400, detail="The uploaded file is empty or cannot be read.")
             
         result = predict(text)
         return result
