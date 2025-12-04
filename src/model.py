@@ -137,8 +137,8 @@ def predict(text, model_path='output/model/final'):
     )
     
     print("Making prediction...")
-    model.eval()  # set to evaluation mode
-    with torch.no_grad():  # disable gradient calculation
+    model.eval()
+    with torch.no_grad():
         outputs = model(**tokenized)
     
     probabilities = torch.softmax(outputs.logits, dim=1)
@@ -146,10 +146,17 @@ def predict(text, model_path='output/model/final'):
     
     label = id_to_label[predicted_class_id.item()]
     
+    # Get all probabilities as dict
+    all_probs = {id_to_label[i]: prob.item() for i, prob in enumerate(probabilities[0])}
+    
+    # Sum all non-Human probabilities
+    ai_probability = sum(prob for lbl, prob in all_probs.items() if lbl != "Human")
+    
     return {
         "prediction": label,
         "confidence": confidence.item(),
-    }   
+        "ai_probability": ai_probability
+    }
 
 if __name__ == "__main__":
     label_map = train()
