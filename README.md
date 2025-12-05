@@ -31,6 +31,9 @@ Built with BERT (NLP), FastAPI (backend), and React + TypeScript (frontend).
 
 AI samples are distributed across 12 model labels: GPT-4, GPT-4o, GPT-3.5-turbo, GPT 5-instant, GPT 5-thinking, GPT 5.1, Gemini 3 Pro, Claude Haiku 4.5, Claude Sonnet 4.5, Claude Opus 4.5, LLaMA, and Mistral.
 
+Tokenization time - ~90mins.
+Training model time - ~26hrs.
+
 **Note:** The AI Text Detection Pile contains generic AI-generated text without specific model labels. Samples were distributed evenly across model folders for training purposes.
 
 **Total dataset: ~400k samples**
@@ -158,8 +161,9 @@ Developed and trained on:
 
 - CPU: AMD Ryzen 9 9900X
 - GPU: NVIDIA RTX 5090 (32GB VRAM)
+- 48GB DDR5 RAM 6400mt/s cl30
 
-**RTX 50-series users:** The 5090 requires PyTorch nightly build (stable doesn't support sm_120 yet):
+**RTX 50-series users:** As of today 05/12/2025 The 5090 requires PyTorch nightly build (stable doesn't support sm_120 yet):
 
 ```bash
 pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu128

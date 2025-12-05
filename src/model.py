@@ -23,7 +23,7 @@ def load_data(path, label_map=None):
     
     return texts, labels, label_map
 
-def create_dataset(texts, labels, tokenizer, batch_size=1000):
+def create_dataset(texts, labels, tokenizer, batch_size=10000):
     all_input_ids = []
     all_attention_masks = []
     
@@ -61,8 +61,8 @@ def get_training_args(output_dir):
     return TrainingArguments(
         output_dir=output_dir,                  # where to save model checkpoints
         num_train_epochs=10,                    # how many times to loop through training data
-        per_device_train_batch_size=16,         # samples processed at once during training
-        per_device_eval_batch_size=16,          # samples processed at once during evaluation
+        per_device_train_batch_size=32,         # samples processed at once during training - vram/ram usage assigning - 16-32 is typical for BERT large. 16 = 12-15 GB VRAM usage, 32 = 24-30 GB VRAM usage, 64 = 48+ GB VRAM usage
+        per_device_eval_batch_size=64,          # samples processed at once during evaluation - speeds up evaluation phase after each epoch - can be set higher than train batch size since it doesnt use gradient computation
         learning_rate=2e-5,                     # step size for weight updates (0.00002)
         weight_decay=0.01,                      # regularization to prevent overfitting
         eval_strategy="epoch",                  # evaluate after each epoch
