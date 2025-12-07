@@ -69,7 +69,7 @@ def build_dataset(dataset_path, output_path):
     dataset = []
     files = collect_files(dataset_path)
     for file_path, label in files:
-        print(f"Processing: {file_path}")  # add this line
+        print(f"Processing: {file_path}")
         texts = extract_text(file_path)
         for text in texts:
             dataset.append({"text": text,"label": label, "source_file": file_path})
@@ -78,7 +78,7 @@ def build_dataset(dataset_path, output_path):
     return dataset
     
 
-    #debugging purpose - to be deleted
+    #debugging purpose
 if __name__ == "__main__":
     build_dataset("Datasets", "output/dataset.json")
     print("Done!")

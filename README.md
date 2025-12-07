@@ -33,7 +33,7 @@ Built with BERT (NLP), FastAPI (backend), and React + TypeScript (frontend).
 **Total dataset: ~400k samples**
 
 Tokenization time: ~90 mins
-Training time: ~12-15 hours (binary classification converges faster than multi-class)
+Training time: ~18 hours
 
 ## Tech Stack
 
@@ -81,6 +81,13 @@ pip install -r requirements.txt
 3. Train the model
 
 ```bash
+# Step 1: Load and unify all datasets into output/dataset.json
+python src/data_loader.py
+
+# Step 2: Clean text, convert to binary labels (Human/AI), split into train/val/test
+python src/preprocess.py
+
+# Step 3: Train the BERT model (~20 hours on RTX 5090)
 python src/model.py
 ```
 
@@ -157,8 +164,8 @@ ai_text_flagger/
 Developed and trained on:
 
 - CPU: AMD Ryzen 9 9900X
-- GPU: NVIDIA RTX 5090 (32GB VRAM)
-- 48GB DDR5 RAM 6400mt/s cl30
+- GPU: ZOTAC GAMING GeForce RTX 5090 SOLID
+- G.SKILL Ripjaws M5 Neo RGB 48GB (2x24GB) 6000MT/s DDR5 CL 30
 
 **RTX 50-series users:** As of today 05/12/2025 The 5090 requires PyTorch nightly build (stable doesn't support sm_120 yet):
 
