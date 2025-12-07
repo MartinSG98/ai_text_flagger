@@ -308,7 +308,21 @@ CloudFront has WAF enabled with the following protections:
 - Core protections (enabled)
 - DDoS protection (enabled)
 
-I had to override the `SizeRestrictions_BODY` rule in `AWS-AWSManagedRulesCommonRuleSet` to "Count" instead of "Block" to allow large text inputs for analysis.
+I had to override several rules in `AWS-AWSManagedRulesCommonRuleSet` to "Count" instead of "Block" to allow text analysis and file uploads to work:
+
+| Rule | Reason for Override |
+|------|---------------------|
+| `SizeRestrictions_BODY` | Allow large text inputs for analysis |
+| `CrossSiteScripting_BODY` | Allow file uploads (flagged as XSS) |
+| `GenericLFI_BODY` | Allow file uploads (flagged as LFI) |
+| `GenericRFI_BODY` | Allow file uploads (flagged as RFI) |
+
+To override these rules:
+1. Go to WAF → Web ACLs → Select your ACL
+2. Click on `AWS-AWSManagedRulesCommonRuleSet`
+3. Click Edit
+4. Find each rule and change from "Use action defined in the rule" to "Override to Count"
+5. Save
 
 ### Cost
 
