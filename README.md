@@ -11,6 +11,7 @@ Built with BERT (NLP), FastAPI (backend), and React + TypeScript (frontend).
 - Binary classification: Human vs AI-generated text
 - Accepts text input via paste or file upload (.txt, .docx, .pdf) - changes might be made in the future
 - Returns confidence scores and AI probability
+- API key authentication for protected endpoints
 
 ## Training Data
 
@@ -78,7 +79,24 @@ source venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
 ```
 
-3. Train the model
+3. Configure environment variables
+
+```bash
+# Create .env file in project root
+cp .env.example .env
+
+# Edit .env and set your API key
+API_KEY=your-secret-key-here
+```
+
+Generate a secure key with Python:
+
+```python
+import secrets
+print(secrets.token_urlsafe(32))
+```
+
+4. Train the model
 
 ```bash
 # Step 1: Load and unify all datasets into output/dataset.json
@@ -91,7 +109,7 @@ python src/preprocess.py
 python src/model.py
 ```
 
-4. Run the API
+5. Run the API
 
 ```bash
 uvicorn src.api:app --reload
@@ -105,15 +123,26 @@ See [ai_text_flagger_ui](https://github.com/MartinSG98/ai_text_flagger_ui) for f
 
 ## API Endpoints
 
+All `/predict` endpoints require the `x-api-key` header.
+
 ### Health Check
 
 `GET /health`
 
 Returns `{"status": "ok"}`
 
+No authentication required.
+
 ### Predict from Text
 
 `POST /predict`
+
+Headers:
+
+```
+x-api-key: your-api-key
+Content-Type: application/json
+```
 
 Request:
 
@@ -131,6 +160,12 @@ Response:
 
 `POST /predict/file`
 
+Headers:
+
+```
+x-api-key: your-api-key
+```
+
 Accepts: `.txt`, `.docx`, `.pdf`
 
 Response:
@@ -147,7 +182,7 @@ ai_text_flagger/
 │   ├── data_loader.py    # Load and unify datasets
 │   ├── preprocess.py     # Clean text, convert to binary labels, split data
 │   ├── model.py          # BERT training and prediction
-│   └── api.py            # FastAPI endpoints
+│   └── api.py            # FastAPI endpoints with auth
 ├── output/
 │   ├── dataset.json      # Unified dataset
 │   ├── train.json        # Training split
@@ -155,6 +190,8 @@ ai_text_flagger/
 │   ├── test.json         # Test split
 │   └── model/            # Trained model files
 ├── Datasets/             # Raw data (not in repo)
+├── .env                  # API key (not in repo)
+├── .env.example          # Example env file
 ├── requirements.txt
 └── README.md
 ```
