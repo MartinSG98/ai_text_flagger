@@ -3,6 +3,11 @@ from datasets import Dataset
 import json
 import torch
 
+# Threshold for AI detection - adjust this value (0.0 to 1.0)
+# Higher = more strict (fewer false positives, more false negatives)
+# Lower = more sensitive (more false positives, fewer false negatives)
+AI_THRESHOLD = 0.65
+
 def load_tokenizer():
     return BertTokenizer.from_pretrained('bert-large-cased')
 
@@ -124,7 +129,7 @@ def predict(text, model_path='output/model/final'):
     # Load label map
     with open(f"{model_path}/label_map.json", 'r') as f:
         label_map = json.load(f)
-    # Reverse it: {0: "Human", 1: "GPT-4", ...}
+    # Reverse it: {0: "Human", 1: "AI"}
     id_to_label = {v: k for k, v in label_map.items()}
     
     print("Tokenizing input text...")
@@ -144,13 +149,17 @@ def predict(text, model_path='output/model/final'):
     probabilities = torch.softmax(outputs.logits, dim=1)
     confidence, predicted_class_id = torch.max(probabilities, dim=1)
     
-    label = id_to_label[predicted_class_id.item()]
-    
     # Get all probabilities as dict
     all_probs = {id_to_label[i]: prob.item() for i, prob in enumerate(probabilities[0])}
     
     # Sum all non-Human probabilities
     ai_probability = sum(prob for lbl, prob in all_probs.items() if lbl != "Human")
+    
+    # Use threshold - only predict AI if probability exceeds threshold
+    if ai_probability > AI_THRESHOLD:
+        label = "AI"
+    else:
+        label = "Human"
     
     return {
         "prediction": label,
