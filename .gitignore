@@ -3,3 +3,4 @@ venv/
 output/
 .env
 atf-backend-key.pem
+ec2_token.txt
