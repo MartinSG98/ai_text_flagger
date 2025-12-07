@@ -146,7 +146,7 @@ def predict(text, model_path='output/model/final'):
     with torch.no_grad():
         outputs = model(**tokenized)
     
-    temperature = 2.0
+    temperature = 4.0
     probabilities = torch.softmax(outputs.logits / temperature, dim=1)
     confidence, predicted_class_id = torch.max(probabilities, dim=1)
     
