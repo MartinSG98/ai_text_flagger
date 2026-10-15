@@ -75,7 +75,7 @@ AI-generated text, 360,979 samples:
 | Source | What it is | Samples |
 |---|---|---|
 | [AI Text Detection Pile](https://huggingface.co/datasets/artem9k/ai-text-detection-pile) | GPT-2, GPT-3, ChatGPT and GPT-J outputs, spread evenly over the twelve model folders | 240,000 |
-| A second generated set | 10,000 more samples in each of the twelve model folders | 120,000 |
+| More samples from the downloaded datasets | Taken from the datasets above and saved as `generated_<model>.json`, 10,000 in each of the twelve model folders | 120,000 |
 | Custom prompts | Documents and essays generated directly with GPT-4, Claude, Gemini, LLaMA and Mistral | about 1,000 |
 
 That makes 520,979 samples. The 80/10/10 split gives 416,783 for training and 52,098 each for validation and test. All AI samples share one label, so the model tells human text from generated text and not one model from another. `test.json` is written, but no script in the repo scores the model on it yet.
